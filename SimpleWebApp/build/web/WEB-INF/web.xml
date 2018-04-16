@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                        http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <display-name>SimpleWebApp</display-name>
+
+ <error-page>
+       <error-code>500</error-code>
+         <location>/error.jsp</location>
+   </error-page>
+      
+    <servlet>
+        <servlet-name>DownloadAttachmentServlet</servlet-name>
+        <servlet-class>Uploads.DownloadAttachmentServlet</servlet-class>
+    </servlet>
+
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/createStudents</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/home</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/studentList</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/modules</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/progressMenuAdmin_1</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/files</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/Calendar</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/moduleList</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/CalendarList</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/StudentInformation</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/progressMenus2</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/uploadToDB</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/Blog</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/Calendar2</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/editStudents</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>aut</filter-name>
+        <url-pattern>/deleteStudents</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>jdbcFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>cookieFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <welcome-file-list>
+        <welcome-file>login</welcome-file>
+    </welcome-file-list>
+</web-app>

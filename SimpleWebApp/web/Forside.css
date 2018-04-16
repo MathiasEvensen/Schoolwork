@@ -1,0 +1,89 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 13.nov.2017, 20:46:31
+    Author     : jonas
+*/
+@font-face {
+font-family: "leixo";
+src: url(font/leixo.ttf);
+}
+
+@font-face {
+font-family: "roboto";
+src: url(font/roboto.ttf);
+}
+
+@font-face {
+font-family: "brandon";
+src: url(font/Brandon.otf);
+}
+
+@font-face {
+font-family: "light";
+src: url(font/TheLightFont.otf);
+}
+
+    body {
+        background-color: #171e21;
+        font-family: roboto;
+        font-size: 14px;
+        
+    }
+    
+    .loginheader{
+        color: #355C7D; 
+        font-size: 40px;
+        font-family: light;
+        text-decoration: overline underline; 
+        //text-decoration: underline;
+    }
+    
+    .login-page {
+        width: 400px;
+        padding: 5% 0 0;
+        margin: auto;
+    }
+    .form{
+        position: relative;
+        z-index: 1;
+        background: #FFFFFF;
+        max-width: 400px;
+        margin: 0 auto 100px;
+        padding-left: 50px; padding-top: 20px; padding-bottom: 50px; padding-right: 50px;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+        border-radius: 15px;
+        }
+        
+    .form input{
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        margin: 15px 0 15px;
+        padding: 15px;
+        box-sizing: border-box;
+        font-size:14px;
+    }
+        
+    .btn1 {
+        text-transform: uppercase;
+        outline: 0;
+        background: #355C7D;
+        box-shadow: 0px 2px 3px #555;
+        width: 100%;
+        border: 0;
+        padding: 15px;
+        margin-top: 15px;
+        color: #FFFFFF;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    
+    .btn1:hover,.btn1:active,.btn1:focus {
+        background: #2c4d68;
+    }
