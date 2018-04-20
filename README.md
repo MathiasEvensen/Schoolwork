@@ -35,10 +35,7 @@ Some of my projects and programs
 [SQL Code](SQL%20needed%20for%20Java.SimpleWebApp/skybase.sql)<br>
 
 ### Textbased Housemarket
-[HouseMarket Main](Java/Hus%20Til%20Salgs/HusMarked.java)<br>
-[HouseMarket Main](Java/Hus%20Til%20Salgs/HusMarked.java)<br>
-[Hus File](Java/Hus%20Til%20Salgs/Hus.java)<br>
-[Hus Test File](Java/Hus%20Til%20Salgs/HusMarkedTest.java)<br>
+
 >There is more in all the folders!
 
 **A short code of the famous FizzBuzz
