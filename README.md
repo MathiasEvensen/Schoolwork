@@ -45,7 +45,6 @@ Some of my projects and programs
 * A short code of the famous FizzBuzz
 
 ```
-
 1. // @author Mathias
 2. 
 3. public class FizzBuzz {
