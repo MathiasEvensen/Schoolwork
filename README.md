@@ -1,19 +1,19 @@
 # Schoolwork
 Some of my projects and programs
 
-### Folders with java code I made: SimpleWebApp
+### Folders with java code I made: Project SimpleWebApp
 [Admin Files](Java/SimpleWebApp/src/java/Admin)&emsp;<br>
 [Connection Files](Java/SimpleWebApp/src/java/Connection)<br>
 [Filter Files](Java/SimpleWebApp/src/java/Filter)<br>
 [Log in/Log out Files](Java/SimpleWebApp/src/java/LoginLogout)<br>
 [Uploading of Files](Java/SimpleWebApp/src/java/Uploads)<br>
 [UserInformation File](Java/SimpleWebApp/src/java/User/UserInfoStud.java)<br>
-### Single files with java code I made: SimpleWebApp
+### Single files with java code I made: Project SimpleWebApp
 [CreateStudent File](Java/SimpleWebApp/src/java/Admin/CreateStudentServlet.java)<br>
 [Feedback File](Java/SimpleWebApp/src/java/Feedback/Feedback.java)<br>
 [UserInformation File](Java/SimpleWebApp/src/java/User/UserInfoStud.java)<br>
 
-### JSP Files correlating with folders: SimpleWebApp
+### JSP Files correlating with folders: Project SimpleWebApp
 #### Admin Folder
 [Create Student JSP](Java/SimpleWebApp/web/WEB-INF/views/createStudentView.jsp)<br>
 [Delete Error JSP](Java/SimpleWebApp/web/WEB-INF/views/deleteStudentErrorView.jsp)<br>
@@ -31,7 +31,7 @@ Some of my projects and programs
 [Header JSP](Java/SimpleWebApp/web/WEB-INF/views/_header.jsp)<br>
 [Menu JSP](Java/SimpleWebApp/web/WEB-INF/views/_menu.jsp)<br>
 
-### SQL File: SimpleWebApp
+### SQL File: Project SimpleWebApp
 [SQL Code](SQL%20needed%20for%20Java.SimpleWebApp/skybase.sql)<br>
 
 ### Textbased Housemarket
