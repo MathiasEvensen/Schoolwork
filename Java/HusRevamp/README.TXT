@@ -4,9 +4,10 @@ Tell the reader (someone who does not know anything about this project)
 all he/she needs to know. The comments should usually include at least:
 ------------------------------------------------------------------------
 
-PROJECT TITLE:Hus Til Salgs
-PURPOSE OF PROJECT:Exam
-VERSION or DATE: 1.0
-HOW TO START THIS PROJECT:Open in IDE and run in command prompt
-AUTHORS:Mathias
-USER INSTRUCTIONS: All instructions provided when you run the project.
+PROJECT TITLE:-----------------Boligmarked
+PURPOSE OF PROJECT:------------Simulere et boligmarked
+VERSION or DATE:---------------1.3
+HOW TO START THIS PROJECT:-----Start Main.java
+AUTHORS:-----------------------Mathias N Evensen
+USER INSTRUCTIONS:
+Start Main.java og du får opp en hjelpemeny som hjelper deg med resten

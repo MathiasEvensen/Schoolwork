@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.params=gateNummer\ gateNavn\ pris\ kvadratMeter\ garage
+comment0.target=Bolig(int,\ java.lang.String,\ int,\ int,\ boolean)
+comment0.text=\r\n\ Constructor\ for\ objects\ of\ class\ Bolig\r\n\ @param\ gateNummer\ gatenummer\r\n\ @param\ gateNavn\ gatenavnet\r\n\ @param\ pris\ prisen\r\n\ @param\ kvadratMeter\ antall\ kvadrat\r\n\ @param\ garage\ har\ den\ garage\r\n
+comment1.params=
+comment1.target=void\ printInformasjon()
+comment1.text=\r\n\ Printer\ samme\ info\ som\ Hus\ men\ har\ lagt\ til\ garage\ som\ ekstra\r\n
+numComments=2

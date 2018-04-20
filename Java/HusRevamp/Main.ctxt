@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(java.lang.String[])
+comment0.text=\r\n\ Main\ metoden\ starter\ programmet.\r\n\ Her\ tar\ en\ switch\ metode\ inn\ parameter\ som\ skriver\ ut\r\n\ kommandoene\ til\ main\ metoden.\r\n\ While\ loopen\ holder\ programmet\ g\u00E5ende\ til\ du\ skriver\ exit.\r\n\ Det\ brukes\ try\ og\ catch\ for\ \u00E5\ fange\ opp\ feilskriving\ i\ input.\r\n\ @param\ args\ the\ command\ line\ arguments\r\n
+numComments=1
