@@ -42,7 +42,7 @@ Some of my projects and programs
 [HouseMarket logic File](Java/HusRevamp/BoligMarked.java)<br>
 >There is more in all the folders!
 
-**A short code of the famous FizzBuzz
+* A short code of the famous FizzBuzz
 
 ```
 
