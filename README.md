@@ -46,29 +46,28 @@ Some of my projects and programs
 
 ```
 
- // @author Mathias
- 
-public class FizzBuzz {
-
-    public static void main(String[] args) {
-        int i=1;
-        
-        for(i = 1; i <= 100; i++){
-            String output = "";
-            
-            if(i%3 == 0){
-                output += "Fizz";
-            }
-            if(i%5 == 0){
-                output += "Buzz";
-            }
-            
-            if(output == ""){
-                System.out.print(i);
-            }
-            System.out.println(output);
-        }
-    }
-    
-}
+1. // @author Mathias
+2. 
+3. public class FizzBuzz {
+4.
+5.    public static void main(String[] args) {
+6.        int i=1;
+7.        
+8.        for(i = 1; i <= 100; i++){
+9.            String output = "";
+10.            
+11.            if(i%3 == 0){
+12.                output += "Fizz";
+13.            }
+14.            if(i%5 == 0){
+15.                output += "Buzz";
+16.            }
+17.            
+18.            if(output == ""){
+19.                System.out.print(i);
+20.            }
+21.            System.out.println(output);
+22.     }
+23.   }
+24. }
 ```
