@@ -30,3 +30,44 @@ Some of my projects and programs
 #### Additional Relevant JSP's
 [Header JSP](Java/SimpleWebApp/web/WEB-INF/views/_header.jsp)<br>
 [Menu JSP](Java/SimpleWebApp/web/WEB-INF/views/_menu.jsp)<br>
+
+### SQL File: SimpleWebApp
+[SQL Code](SQL%20needed%20for%20Java.SimpleWebApp/skybase.sql)<br>
+
+### Textbased Housemarket
+[HouseMarket Main](Java/Hus%20Til%20Salgs/HusMarked.java)<br>
+[HouseMarket Main](Java/Hus%20Til%20Salgs/HusMarked.java)<br>
+[Hus File](Java/Hus%20Til%20Salgs/Hus.java)<br>
+[Hus Test File](Java/Hus%20Til%20Salgs/HusMarkedTest.java)<br>
+>There is more in all the folders!
+
+**A short code of the famous FizzBuzz
+
+```
+
+ // @author Mathias
+ 
+public class FizzBuzz {
+
+    public static void main(String[] args) {
+        int i=1;
+        
+        for(i = 1; i <= 100; i++){
+            String output = "";
+            
+            if(i%3 == 0){
+                output += "Fizz";
+            }
+            if(i%5 == 0){
+                output += "Buzz";
+            }
+            
+            if(output == ""){
+                System.out.print(i);
+            }
+            System.out.println(output);
+        }
+    }
+    
+}
+```
