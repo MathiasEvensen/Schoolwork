@@ -35,7 +35,7 @@ Some of my projects and programs
 [SQL Code](SQL%20needed%20for%20Java.SimpleWebApp/skybase.sql)<br>
 
 ### Textbased Housemarket
-[HouseMarket Main](Java/Hus%20Til%20Salgs/Main.java)<br>
+[HouseMarket Main](Java/HusRevamp/Main.java)<br>
 [Bolig File](Java/HusRevamp/Bolig.java)<br>
 [Hus File](Java/HusRevamp/Hus.java)<br>
 [Leilighet File](Java/HusRevamp/Leilighet.java)<br>
