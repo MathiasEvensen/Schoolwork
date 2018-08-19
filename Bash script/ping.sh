@@ -1,15 +1,16 @@
 #!/bin/bash
 
-#IF USED IN WINDOWS, BASH CONSOLE HAS TO BE RUN AS AN ADMIN
+#IF USED IN WINDOWS BASH CONSOLE, YOU NEED TO RUN BASH AS AN ADMIN
 
 x=0
 while [ $x = 0 ]
 do
 
 	echo "
-1. See your IP and list others
+1. See your IP and list pings
 2. Write IP and ping all
 3. See your IP
+4. Write IP and get list of pings
 q - exit"
 	read answer
 	case "$answer" in
@@ -48,19 +49,35 @@ and the rest will be checked : " p
 Your private IP: $v
 Your public  IP: $v2" ;;
 
+		4)
+			read -p "
+write the three first known integers (ex 192.168.0.)
+and the rest will be checked : " p
+			#p=${v::-2} 
+
+				#ping list of IP
+				echo "list of found IP: "
+				prefix=${1:-$p}
+
+				for ip in `seq 1 254`
+					do
+						(ping -c1 -w1 ${prefix}${ip} > /dev/null 2>&1 && echo ${prefix}${ip}) &
+					done
+				wait
+			
+		x=0 ;;
+
 		q)
 
 			echo "Bye"
-			sleep 2
+			sleep 1
 			x=1 ;;
 		*)
 
 		echo "
 Something went wrong.
-Options are 1,2,3,q"
+Options are 1,2,3,4,q"
 		sleep 4 ;;
 	esac
 
 done
-
-
