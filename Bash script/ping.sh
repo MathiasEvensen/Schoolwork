@@ -22,7 +22,7 @@ q - exit"
 
 				for ip in `seq 1 254`
 					do
-						(ping -w1 ${prefix}${ip} > /dev/null 2>&1 && echo ${prefix}${ip}) &
+						(ping -c1 -w1 ${prefix}${ip} > /dev/null 2>&1 && echo ${prefix}${ip}) &
 					done
 				wait
 			
@@ -34,7 +34,7 @@ write the three first known integers (ex 192.168.0.)
 and the rest will be checked : " p
 			for ip in `seq 1 254` #husk 254
 				do 
-					ping -w1 $p$ip
+					ping -c1 -w1 $p$ip
 			done
 			
 		x=0 ;;
