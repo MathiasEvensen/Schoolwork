@@ -32,7 +32,7 @@ q - exit"
 			read -p "
 write the three first known integers (ex 192.168.0.)
 and the rest will be checked : " p
-			for ip in `seq 1 2` #husk 254
+			for ip in `seq 1 254` #husk 254
 				do 
 					ping -c1 -w1 $p$ip
 			done
