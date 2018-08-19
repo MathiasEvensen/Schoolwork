@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#IF USED IN WINDOWS, BASH CONSOLE HAS TO BE RUN AS AN ADMIN
+
 x=0
 while [ $x = 0 ]
 do
