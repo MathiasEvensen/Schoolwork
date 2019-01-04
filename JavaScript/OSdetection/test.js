@@ -1,5 +1,4 @@
 var http = require('http');
-var os = require('os');
 var dns = require('dns');
 var tid = require('./script');
 
