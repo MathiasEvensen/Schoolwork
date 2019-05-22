@@ -5,7 +5,6 @@ import socket
 import subprocess
 import ipaddress
 import threading
-from multiprocessing.pool import ThreadPool
 
 kjorer = True
 
@@ -108,8 +107,8 @@ class Vindu(Tk):
     t.start()
 
   def script(self):
-    subprocess.call("C:/Users/mathi/Desktop/ping2.sh", shell=True)
     os.chmod('C:/Users/mathi/Desktop/ping2.sh', 0o755)
+    subprocess.call("C:/Users/mathi/Desktop/ping2.sh", shell=True)
 
   def exiting(self):
     self.destroy()
@@ -120,6 +119,7 @@ def starter():
   app.geometry('305x220')
   app.title('Ping')
   app.mainloop()
+
 
 if __name__ == '__main__':
   def callback():
