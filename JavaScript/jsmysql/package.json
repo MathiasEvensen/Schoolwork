@@ -1,8 +1,0 @@
-{
-  "name": "Local instance MySQL80",
-  "version": "0.0.1",
-  "author": "Mathias",
-  "dependencies": {
-    "mysql": "^2.16.0"
-  }
-}

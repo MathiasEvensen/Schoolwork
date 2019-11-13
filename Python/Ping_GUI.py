@@ -5,6 +5,8 @@ import socket
 import subprocess
 import ipaddress
 import threading
+import colorama
+from colorama import Fore, Style
 
 kjorer = True
 
@@ -95,13 +97,13 @@ class Vindu(Tk):
                                     stdout=subprocess.PIPE).communicate()[0]
 
           if "Destination host unreachable" in output.decode('utf-8'):
-            print(str(all_hosts[i]), "is Offline")
+            print(Fore.RED + str(all_hosts[i]), "is Offline")
           elif "Request timed out" in output.decode('utf-8'):
-            print(str(all_hosts[i]), "is Offline")
+            print(Fore.RED + str(all_hosts[i]), "is Offline")
           elif kjorer == False:
             break
           else:
-            print(str(all_hosts[i]), "is Online")
+            print(Fore.GREEN + str(all_hosts[i]), "is Online")
 
     t = threading.Thread(target=callback)
     t.start()
