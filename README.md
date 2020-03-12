@@ -2,6 +2,8 @@
 Some of my projects and programs
 ### Network tool with gui
 [Ping_gui](Python/Ping_GUI.py)
+### My discord bot
+[Poopy the discord bot](Python/poopy.py)
 
 ### SQL
 #### PL/SQL
