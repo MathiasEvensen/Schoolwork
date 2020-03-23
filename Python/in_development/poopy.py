@@ -5,13 +5,13 @@ import speedtest
 from giphy_client.rest import ApiException
 from discord.ext import commands
 
-disctoken = 'Enter your token here'
+disctoken = 'YOUR_TOKEN_HERE'
 
-giphy_token = 'Enter Your Giphy token here'
+giphy_token = 'YOUR_GIPHY_TOKEN_HERE'
 bot = commands.Bot(command_prefix='!')
 
 api_instance = giphy_client.DefaultApi()
-config = {'api_key': 'Enter Your Giphy token here', 'q': '', 'limit': 1, 'rating': 'PG-13'}
+config = {'api_key': 'YOUR_GIPHY_TOKEN_HERE', 'q': '', 'limit': 1, 'rating': 'PG-13'}
 
 try:
     api_response = api_instance.gifs_search_get(config['api_key'], limit=config['limit'], rating=config['rating'], q=config['q'])
@@ -52,16 +52,16 @@ async def st(ctx):
 
 @bot.command()
 async def info(ctx):
-    embed = discord.Embed(title="Poopy", description="Produces poop :poop:", color=0xeee657)
+    embed = discord.Embed(title="Poopy", description="Produces poop when words of :poop: are said", color=0xeee657)
 
     # give info about you here
-    embed.add_field(name="Creator", value="YOUR NAME")
+    embed.add_field(name="Creator", value="iMatMan")
 
     # Shows the number of servers the bot is member of.
     embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
 
     # give users a link to invite thsi bot to their server
-    embed.add_field(name="Invite", value="[Invite link](Enter your bots OAUTH link here)")
+    embed.add_field(name="Invite", value="[Invite link](https://discordapp.com/api/oauth2/authorize?client_id=680945826742141021&permissions=1275591744&scope=bot)")
 
     await ctx.send(embed=embed)
 
@@ -97,9 +97,12 @@ async def help(ctx):
 
     await ctx.send(embed=embed)
 
-keyword = ['bash', 'bæsj', 'drit', 'shit']
+keyword = ['bash', 'bæsj', 'drit', 'shit', 'poop']
 @bot.event
 async def on_message(message):
+    if message.author == bot.user:
+        return
+    if message.author.bot: return
 
     message_text = message.content.strip().lower()
     for i in keyword:
@@ -110,4 +113,3 @@ async def on_message(message):
     await bot.process_commands(message)
 
 bot.run(disctoken)
-
