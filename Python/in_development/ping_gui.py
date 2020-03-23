@@ -65,7 +65,7 @@ class Vindu(Tk):
 
     def stopit(self):
         def callback():
-            self.entry.delete(0, 'end')
+            #self.entry.delete(0, 'end')
             global kjorer
             kjorer = False
 
@@ -91,12 +91,16 @@ class Vindu(Tk):
                             print(k + ": " + str(v))
                     if isinstance(v, dict):
                         seek_keys(v, key_list)
-            s = speedtest.Speedtest()
-            s.get_servers()
-            s.get_best_server()
-            s.get_config()
-            res = s.results.dict()
-            seek_keys(res, filtered_list_ip)
+            if len(self.entry.get()) == 0:
+                print("Retrieving public ip address: \n")
+                s = speedtest.Speedtest()
+                s.get_servers()
+                s.get_best_server()
+                s.get_config()
+                res = s.results.dict()
+                seek_keys(res, filtered_list_ip)
+            else:
+                print("Nothing should be written in input\n")
 
         t = threading.Thread(target=callback)
         t.start()
@@ -124,17 +128,22 @@ class Vindu(Tk):
                 seek_keys(res, filtered_list)
                 print('')
                 print("Download: {:.2f} Mb/s".format(res["download"] / 1024 / 1024) +
-                      '\nUpload: {:.2f} Mb/s'.format(res["upload"] / 1024 / 1024) + '\nPing: {}\n'.format(res["ping"]))
+                      '\nUpload: {:.2f} Mb/s'.format(res["upload"] / 1024 / 1024) +
+                      '\nPing: {}\n'.format(res["ping"]))
             else:
-                print("Nothing should be written in input")
+                print("Nothing should be written in input\n")
 
         t = threading.Thread(target=callback)
         t.start()
 
     def run_ping(self):
         def callback():
+            global kjorer
+
             if len(self.entry.get()) == 0:
-                os.system('ping localhost')
+                print("You have to write an IP : EX(192.168.1.0)\n")
+            elif kjorer == False: # TODO: Not working
+                stopit()
             else:
                 os.system('ping ' + self.entry.get())
 
@@ -154,7 +163,7 @@ class Vindu(Tk):
 
         def callback():
             if len(self.entry.get()) == 0:
-                print("You have to write an IP : EX(192.168.1.0)")
+                print("You have to write an IP : EX(192.168.1.0)\n")
             else:
                 try:
                     net_address = str(self.entry.get()) + "/24"
@@ -181,9 +190,9 @@ class Vindu(Tk):
 
 
                 except ValueError:
-                    print("Check spelling or add 0 to last number in ip: EX(192.168.1.0)")
+                    print("Check spelling or add 0 to last number in ip: EX(192.168.1.0)\n")
                 except Exception:
-                    print("Something went wrong")
+                    print("Something went wrong\n")
 
         t = threading.Thread(target=callback)
         t.start()
