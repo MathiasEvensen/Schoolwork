@@ -1,9 +1,9 @@
 # Schoolwork
 Some of my projects and programs
 ### Network tool with gui
-[Ping_gui](Python/Ping_GUI.py)
+[Ping_gui](Python/in_development/Ping_GUI.py)
 ### My discord bot
-[Poopy the discord bot](Python/poopy.py)
+[Poopy the discord bot](Python/in_development/poopy.py)
 
 ### SQL
 #### PL/SQL
