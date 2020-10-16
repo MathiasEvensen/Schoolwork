@@ -3,8 +3,9 @@ from colorama import Fore
 from tkinter import *
 from tkinter import ttk
 from tqdm import tqdm
-import multiprocessing as mp
+from queue import Queue
 import urllib.request, re
+import time
 import os
 import socket
 import subprocess
@@ -31,7 +32,7 @@ class Vindu(Tk):
         get_ip = ttk.Button(text='Get public IP', command=self.get_public_ip)
         get_ip.place(x=500, y=25)
 
-        ping_all_ip = ttk.Button(text='Ping all', command=self.ping_all)
+        ping_all_ip = ttk.Button(text='Ping all', command=self.multi_ping)
         ping_all_ip.grid(column=0, row=2)
 
         stop_ping_all = ttk.Button(text='stop ping all', command=self.stopit)
@@ -182,47 +183,92 @@ class Vindu(Tk):
         t = threading.Thread(target=callback)
         t.start()
 
-    def ping_all(self):
+    def multi_ping(self):
         self.output.delete('1.0', END)
-
         def callback():
+            print_lock = threading.Lock()
+
+            # Prompt the user to input a network address
+            net_addr = str(self.entry.get())
+            # actual code start time
+            startTime = time.time()
+            # Create the network
+            ip_net = ipaddress.ip_network(net_addr)
+            # Get all hosts on that network
+            all_hosts = list(ip_net.hosts())
+            # Configure subprocess to hide the console window
+            info = subprocess.STARTUPINFO()
+            info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            info.wShowWindow = subprocess.SW_HIDE
+
+            print('Sweeping Network with ICMP: ', net_addr)
+            self.output.insert(END, 'Sweeping Network with ICMP: ' + str(net_addr) + '\n')
+
             if len(self.entry.get()) == 0:
                 self.output.insert(END, "You have to write an IP : EX(192.168.1.0)\n")
-            elif self.stopit():
-                p.terminate() # TODO: Fix pickle serialisation
-                p.join()
             else:
-                try:
-                    net_address = str(self.entry.get()) + "/24"
-                    ip_net = ipaddress.ip_network(net_address)
-                    all_hosts = list(ip_net.hosts())
-                    info = subprocess.STARTUPINFO()
-                    info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                    info.wShowWindow = subprocess.SW_HIDE
+                def pingsweep(ip):
 
-                    for i in tqdm(range(len(all_hosts))):
-                        output = subprocess.Popen(['ping', '-n', '1', '-w', '500', str(all_hosts[i])],
-                                                    stdout=subprocess.PIPE).communicate()[0]
+                    # for windows:   -n is ping count, -w is wait (ms)
+                    # for linux: -c is ping count, -w is wait (ms)
+                    # I didn't test subprocess in linux, but know the ping count must change if OS changes
 
-                        if "Destination host unreachable" in output.decode('utf-8'):
-                            #print(Fore.RED + str(all_hosts[i]), "  Offline")
+                    ress = \
+                    subprocess.Popen(['ping', '-n', '1', '-w', '150', str(all_hosts[ip])], stdout=subprocess.PIPE,
+                                         startupinfo=info).communicate()[0]
+
+                    # lock this section, until we get a complete chunk
+                    # then free it (so it doesn't write all over itself)
+                    with print_lock:
+                        # normalize colors to grey
+                        print('\033[93m', end='')
+                        # code logic if we have/don't have good response
+                        if "Reply" in ress.decode('utf-8'):
+                            print(str(all_hosts[ip]), '\033[32m' + "is Online")
+                            self.output.insert(END, str(all_hosts[ip]) + " is Online\n")
+                        elif "Destination host unreachable" in ress.decode('utf-8'):
+                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Unreachable)")
                             pass
-                        elif "Request timed out" in output.decode('utf-8'):
-                            #print(Fore.RED + str(all_hosts[i]), "  Offline")
+                        elif "Request timed out" in ress.decode('utf-8'):
+                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Timeout)")
                             pass
                         else:
-                            self.output.insert(END, '\r'+Fore.GREEN + str(all_hosts[i]), "  Online\n")
-                            self.output.insert(END, output)
+                            # print colors in green if online
+                            print("UNKNOWN", end='')
 
+                # defines a new ping using def pingsweep for each thread
+                # holds task until thread completes
+                def threader():
+                    while True:
+                        worker = q.get()
+                        pingsweep(worker)
+                        q.task_done()
 
-                except ValueError:
-                    self.output.insert(END, "Check spelling or add 0 to last number in ip: EX(192.168.1.0)\n")
-                except Exception:
-                    self.output.insert(END, "Something went wrong\n")
+                q = Queue()
 
-        self.output.see("end")
-        p = mp.Process(target=callback)
-        p.start()
+                # up to 100 threads, daemon for cleaner shutdown
+                # just spawns the threads and makes them daemon mode
+                for x in range(100):
+                    t = threading.Thread(target=threader)
+                    t.daemon = True
+                    t.start()
+
+                # loops over the last octet in our network object
+                # passing it to q.put (entering it into queue)
+                for worker in range(len(all_hosts)):
+                    q.put(worker)
+
+                # queue management
+                q.join()
+
+                # ok, give us a final time report
+                runtime = float("%0.2f" % (time.time() - startTime))
+                print("Run Time: ", runtime, "seconds")
+                self.output.insert(END, "Run Time: " + str(runtime) + " seconds")
+
+        t = threading.Thread(target=callback)
+        t.start()
+
 
     def script(self):
         os.chmod('C:/Users/mathi/Desktop/ping2.sh', 0o755)
