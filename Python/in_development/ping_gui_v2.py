@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QMessageBox
 from ip2geotools.databases.noncommercial import DbIpCity
 from tqdm import tqdm
 from queue import Queue
+from collections import Counter
 import urllib.request, re
 import time
 import os
@@ -21,6 +22,7 @@ import subprocess
 import ipaddress
 import threading
 import speedtest
+import nmap
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -81,7 +83,7 @@ class Ui_Dialog(object):
         self.pushButton_3.setObjectName("pushButton_3")
 
         self.textEdit = QtWidgets.QTextEdit(Dialog)
-        self.textEdit.setGeometry(QtCore.QRect(10, 90, 371, 351))
+        self.textEdit.setGeometry(QtCore.QRect(10, 90, 391, 351))
         self.textEdit.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                     "background-color: rgb(212, 212, 212);")
         self.textEdit.setFrameShape(QtWidgets.QFrame.WinPanel)
@@ -120,12 +122,6 @@ class Ui_Dialog(object):
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_8.setObjectName("pushButton_8")
 
-        self.verticalScrollBar = QtWidgets.QScrollBar(Dialog)
-        self.verticalScrollBar.setGeometry(QtCore.QRect(380, 89, 20, 351))
-        self.verticalScrollBar.setOrientation(QtCore.Qt.Vertical)
-        self.verticalScrollBar.setInvertedAppearance(False)
-        self.verticalScrollBar.setObjectName("verticalScrollBar")
-
         self.progressBar = QtWidgets.QProgressBar(Dialog)
         self.progressBar.setGeometry(QtCore.QRect(430, 420, 118, 23))
         self.progressBar.setStyleSheet("background-color: rgb(245, 245, 245);")
@@ -144,7 +140,7 @@ class Ui_Dialog(object):
         self.pushButton_4.clicked.connect(self.get_public_ip)
         self.pushButton_5.clicked.connect(self.measure_speed)
         self.pushButton_6.clicked.connect(self.ping_your_ip)
-
+        self.pushButton_7.clicked.connect(self.port_scanner)
         self.pushButton_8.clicked.connect(self.show_popup)
 
     def retranslateUi(self, Dialog):
@@ -226,7 +222,7 @@ class Ui_Dialog(object):
         def callback():
 
             if len(text_input) == 0:
-                self.textEdit.append("You have to write an IP : EX(192.168.1.0)\n")
+                self.textEdit.append("You have to write an IP : EX(192.168.1.1)\n")
             else:
                 self.textEdit.append("Pinging: " + text_input + "\n")
                 ping = os.popen('ping ' + text_input).read()
@@ -285,10 +281,10 @@ class Ui_Dialog(object):
                     if k in key_list:
                         if isinstance(v, dict):
                             # print(k + ": " + list(v.keys())[0])
-                            self.textEdit.append(k + ": " + list(v.keys())[0] + "\n")
+                            self.textEdit.append(k + ': ' + list(v.keys())[0] + '\n')
                         else:
                             # print(k + ": " + str(v))
-                            self.textEdit.append(k + ": " + str(v) + "\n")
+                            self.textEdit.append(k + ': ' + str(v) + '\n')
                     if isinstance(v, dict):
                         seek_keys(v, key_list)
             if len(text_input) == 0:
@@ -302,12 +298,59 @@ class Ui_Dialog(object):
                 res = s.results.dict()
                 seek_keys(res, filtered_list)
                 response = DbIpCity.get(dataip, api_key = 'free')
-                self.textEdit.append("city: " + response.city + "\nstate: " + response.region + "\n")
-                self.textEdit.append("Download: {:.2f} Mbps/s".format(res["download"] / 1024 / 1024) +
-                      '\nUpload: {:.2f} Mbps/s'.format(res["upload"] / 1024 / 1024) +
-                      '\nPing: {}\n'.format(res["ping"]))
+                self.textEdit.append('city: ' + response.city + '\nstate: ' + response.region + '\n'+
+                                     '\nDownload: {:.2f} Mbps/s'.format(res["download"] / 1024 / 1024) +
+                                     '\nUpload: {:.2f} Mbps/s'.format(res["upload"] / 1024 / 1024) +
+                                     '\nPing: {}'.format(res["ping"]) + ' ms')
             else:
                 self.textEdit.append("Nothing should be written in input\n")
+
+        t = threading.Thread(target=callback)
+        t.start()
+
+    def port_scanner(self):
+        text_input = self.lineEdit.text()
+        self.textEdit.clear()
+        def callback():
+            if len(text_input) == 0:
+                self.textEdit.append("You have to write an IP : EX(192.168.1.1)\n")
+            else:
+                socket.setdefaulttimeout(0.6)
+                print_lock = threading.Lock()
+
+                t_IP = socket.gethostbyname(text_input)
+                self.textEdit.append('Starting scan on host: ' + str(text_input) + '\n')
+
+                def portscan(port):
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    try:
+                        conn = s.connect((t_IP, port))
+                        with print_lock:
+                            self.textEdit.append(str(port) + ' is open')
+                        conn.close()
+                    except:
+                        pass
+
+                def threader():
+                    while True:
+                        worker = q.get()
+                        portscan(worker)
+                        q.task_done()
+
+                q = Queue()
+                start_time = time.time()
+
+                for x in range(64):
+                    th = threading.Thread(target=threader)
+                    th.daemon = True
+                    th.start()
+
+                for worker in range(1, 500):
+                    q.put(worker)
+
+                q.join()
+                runtime = float("%0.2f" % ( time.time() - start_time))
+                self.textEdit.append("\nRun Time: " + str(runtime) + " seconds")
 
         t = threading.Thread(target=callback)
         t.start()
@@ -317,19 +360,14 @@ class Ui_Dialog(object):
         self.textEdit.clear()
         def callback():
             if len(text_input) == 0:
-                self.textEdit.append("You have to write an IP : EX(192.168.1.0)\n")
+                self.textEdit.append("You have to write an IP : EX(192.168.1.0/24)\n")
             else:
                 print_lock = threading.Lock()
 
-                # Prompt the user to input a network address
                 net_addr = str(text_input)
-                # actual code start time
                 start_time = time.time()
-                # Create the network
                 ip_net = ipaddress.ip_network(net_addr)
-                # Get all hosts on that network
                 all_hosts = list(ip_net.hosts())
-                # Configure subprocess to hide the console window
                 info = subprocess.STARTUPINFO()
                 info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 info.wShowWindow = subprocess.SW_HIDE
@@ -342,8 +380,6 @@ class Ui_Dialog(object):
                     subprocess.Popen(['ping', '-n', '1', '-w', '600', str(all_hosts[ip])], stdout=subprocess.PIPE,
                                          startupinfo=info).communicate()[0]
 
-                    # lock this section, until we get a complete chunk
-                    # then free it (so it doesn't write all over itself)
                     with print_lock:
                         print('\033[93m', end='')
                         # code logic if we have/don't have good response
@@ -360,8 +396,6 @@ class Ui_Dialog(object):
                             print("UNKNOWN", end='')
                             self.textEdit.append("UNKNOWN")
 
-                # defines a new ping using def pingsweep for each thread
-                # holds task until thread completes
                 def threader():
                     while True:
                         worker = q.get()
@@ -370,18 +404,14 @@ class Ui_Dialog(object):
 
                 q = Queue()
 
-                # just spawns the threads and makes them daemon mode
-                for x in range(16):
+                for x in range(64):
                     th = threading.Thread(target=threader)
                     th.daemon = True
                     th.start()
 
-                # loops over the last octet in our network object
-                # passing it to q.put (entering it into queue)
                 for worker in range(len(all_hosts)):
                     q.put(worker)
 
-                # queue management
                 q.join()
 
                 runtime = float("%0.2f" % (time.time() - start_time))
