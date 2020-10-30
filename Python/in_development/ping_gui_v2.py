@@ -11,18 +11,18 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from ip2geotools.databases.noncommercial import DbIpCity
-from tqdm import tqdm
 from queue import Queue
-from collections import Counter
-import urllib.request, re
+import urllib.request
 import time
 import os
+import re
 import socket
 import subprocess
 import ipaddress
 import threading
 import speedtest
-import nmap
+import nmap3
+import pprint
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -70,14 +70,13 @@ class Ui_Dialog(object):
         self.pushButton.setObjectName("pushButton")
 
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(120, 50, 91, 23))
-        self.pushButton_2.setToolTipDuration(-1)
+        self.pushButton_2.setGeometry(QtCore.QRect(100, 50, 91, 23))
         self.pushButton_2.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_2.setObjectName("pushButton_2")
 
         self.pushButton_3 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_3.setGeometry(QtCore.QRect(240, 50, 91, 23))
+        self.pushButton_3.setGeometry(QtCore.QRect(340, 15, 91, 23))
         self.pushButton_3.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_3.setObjectName("pushButton_3")
@@ -111,7 +110,7 @@ class Ui_Dialog(object):
         self.pushButton_6.setObjectName("pushButton_6")
 
         self.pushButton_7 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_7.setGeometry(QtCore.QRect(340, 10, 131, 23))
+        self.pushButton_7.setGeometry(QtCore.QRect(300, 50, 81, 23))
         self.pushButton_7.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_7.setObjectName("pushButton_7")
@@ -121,6 +120,12 @@ class Ui_Dialog(object):
         self.pushButton_8.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_8.setObjectName("pushButton_8")
+
+        self.pushButton_9 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_9.setGeometry(QtCore.QRect(200, 50, 91, 23))
+        self.pushButton_9.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
+                                        "background-color: rgb(212, 212, 212);")
+        self.pushButton_9.setObjectName("pushButton_8")
 
         self.progressBar = QtWidgets.QProgressBar(Dialog)
         self.progressBar.setGeometry(QtCore.QRect(430, 420, 118, 23))
@@ -142,6 +147,7 @@ class Ui_Dialog(object):
         self.pushButton_6.clicked.connect(self.ping_your_ip)
         self.pushButton_7.clicked.connect(self.port_scanner)
         self.pushButton_8.clicked.connect(self.show_popup)
+        self.pushButton_9.clicked.connect(self.os_detect)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -179,11 +185,14 @@ class Ui_Dialog(object):
         self.pushButton_6.setToolTip(_translate("Dialog", "Pings your local machine"))
         self.pushButton_6.setText(_translate("Dialog", "Ping Host"))
 
-        self.pushButton_7.setToolTip(_translate("Dialog", "Runs an nmap command that you have to write in the input"))
-        self.pushButton_7.setText(_translate("Dialog", "Run Nmap Command"))
+        self.pushButton_7.setToolTip(_translate("Dialog", "Port scan of open ports on specified IP"))
+        self.pushButton_7.setText(_translate("Dialog", "Port scan"))
 
         self.pushButton_8.setToolTip(_translate("Dialog", "Gives a popup box with help"))
         self.pushButton_8.setText(_translate("Dialog", "Information"))
+
+        self.pushButton_9.setToolTip(_translate("Dialog", "OS detection of specified IP"))
+        self.pushButton_9.setText(_translate("Dialog", "OS detection"))
 
     def show_popup(self):
         msg = QMessageBox()
@@ -200,12 +209,8 @@ class Ui_Dialog(object):
         msg.exec_()
 
     def clear_text(self):
-        #def callback():
         self.lineEdit.clear()
         self.textEdit.clear()
-
-        #t = threading.Thread(target=callback)
-        #t.start()
 
     def ping_your_ip(self):
         self.textEdit.clear()
@@ -220,7 +225,6 @@ class Ui_Dialog(object):
         text_input = self.lineEdit.text()
         self.textEdit.clear()
         def callback():
-
             if len(text_input) == 0:
                 self.textEdit.append("You have to write an IP : EX(192.168.1.1)\n")
             else:
@@ -231,12 +235,38 @@ class Ui_Dialog(object):
         t = threading.Thread(target=callback)
         t.start()
 
-    def get_public_ip(self):
+    def os_detect(self):
         text_input = self.lineEdit.text()
         self.textEdit.clear()
         def callback():
-            filtered_list_ip = ['ip']
+            self.textEdit.append('Performing OS scan on: ' + str(text_input) + '\n')
+            nmap = nmap3.Nmap()
+            version_result = nmap.nmap_version_detection(text_input)
+            pprint.pprint(version_result, width=61)
 
+            try:
+                self.textEdit.append('Port       : ' + str(version_result[0]['port']))
+                self.textEdit.append('Protocol  : ' + str(version_result[0]['protocol']))
+                self.textEdit.append('Reason   : ' + str(version_result[0]['reason']))
+                self.textEdit.append('Method   : ' + str(version_result[0]['service']['method']))
+                self.textEdit.append('OS type  : ' + str(version_result[0]['service']['ostype']))
+            except IndexError:
+                self.textEdit.append('Could not detect OS')
+            try:
+                if str(version_result[0]['service']['ostype']) == 'Linux':
+                    self.textEdit.append('Conn    : ' + str(version_result[0]['service']['name']))
+                    self.textEdit.append('Product : ' + str(version_result[0]['service']['product']))
+                    self.textEdit.append('Version : ' + str(version_result[0]['service']['version']))
+            except:
+                self.textEdit.append('Error retrieving values')
+
+        t = threading.Thread(target=callback)
+        t.start()
+
+    def get_public_ip(self):
+        self.textEdit.clear()
+        def callback():
+            filtered_list_ip = ['ip']
             def seek_keys(d, key_list):
                 for k, v in d.items():
                     if k in key_list:
@@ -249,32 +279,30 @@ class Ui_Dialog(object):
                     if isinstance(v, dict):
                         seek_keys(v, key_list)
 
-            if len(text_input) == 0:
-                # print("Retrieving public ip address: \n")
-                self.textEdit.append("Retrieving public ip address: \n")
-                # self.output.insert(END, "Retrieving public ip address: \n")
+            self.textEdit.append("Retrieving public ip address: \n")
+            try:
                 s = speedtest.Speedtest()
                 s.get_servers()
                 s.get_best_server()
                 s.get_config()
                 res = s.results.dict()
                 seek_keys(res, filtered_list_ip)
-                # self.output.insert(END, str(seek_keys(res, filtered_list_ip)))
-            else:
-                #self.output.insert(END, "Nothing should be written in input\n")
-                self.textEdit.append("Nothing should be written in input\n")
-
-        #self.output.see("end")
+            except:
+                self.textEdit.append("Could not access server")
 
         t = threading.Thread(target=callback)
         t.start()
 
     def measure_speed(self):
-        text_input = self.lineEdit.text()
         self.textEdit.clear()
         def callback():
-            dataip = re.search('"([0-9.]*)"',
-                               urllib.request.urlopen("http://ip.jsontest.com/").read().decode('utf-8')).group(1)
+            global response, res
+            try:
+                dataip = re.search('"([0-9.]*)"',
+                                   urllib.request.urlopen("http://ip.jsontest.com/").read().decode('utf-8')).group(1)
+                response = DbIpCity.get(dataip, api_key='free')
+            except:
+                self.textEdit.append('Could not retrieve location data')
             filtered_list = ['cc', 'host', 'ip', 'isp']
             def seek_keys(d, key_list):
                 for k, v in d.items():
@@ -287,9 +315,9 @@ class Ui_Dialog(object):
                             self.textEdit.append(k + ': ' + str(v) + '\n')
                     if isinstance(v, dict):
                         seek_keys(v, key_list)
-            if len(text_input) == 0:
-                # print("Running speedtest\n")
-                self.textEdit.append("Running speedtest. Please wait.\n")
+
+            self.textEdit.append("Running speedtest. Please wait.\n")
+            try:
                 s = speedtest.Speedtest()
                 s.get_servers()
                 s.get_best_server()
@@ -297,13 +325,13 @@ class Ui_Dialog(object):
                 s.upload()
                 res = s.results.dict()
                 seek_keys(res, filtered_list)
-                response = DbIpCity.get(dataip, api_key = 'free')
-                self.textEdit.append('city: ' + response.city + '\nstate: ' + response.region + '\n'+
+            except:
+                self.textEdit.append("Could not access speedtest")
+
+            self.textEdit.append('city: ' + response.city + '\nstate: ' + response.region + '\n'+
                                      '\nDownload: {:.2f} Mbps/s'.format(res["download"] / 1024 / 1024) +
                                      '\nUpload: {:.2f} Mbps/s'.format(res["upload"] / 1024 / 1024) +
                                      '\nPing: {}'.format(res["ping"]) + ' ms')
-            else:
-                self.textEdit.append("Nothing should be written in input\n")
 
         t = threading.Thread(target=callback)
         t.start()
@@ -315,11 +343,14 @@ class Ui_Dialog(object):
             if len(text_input) == 0:
                 self.textEdit.append("You have to write an IP : EX(192.168.1.1)\n")
             else:
-                socket.setdefaulttimeout(0.6)
-                print_lock = threading.Lock()
+                try:
+                    socket.setdefaulttimeout(0.6)
+                    print_lock = threading.Lock()
 
-                t_IP = socket.gethostbyname(text_input)
-                self.textEdit.append('Starting scan on host: ' + str(text_input) + '\n')
+                    t_IP = socket.gethostbyname(text_input)
+                    self.textEdit.append('Starting scan on host: ' + str(text_input) + '\n')
+                except:
+                    self.textEdit.append('Error')
 
                 def portscan(port):
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
