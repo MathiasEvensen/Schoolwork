@@ -27,6 +27,8 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.ui
+.ui
 MANIFEST
 
 # PyInstaller
@@ -157,4 +159,5 @@ hs_err_pid*
 # .ideas
 *.idea
 .idea/
-
+.vscode/
+*.vscode

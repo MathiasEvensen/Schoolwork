@@ -125,7 +125,13 @@ class Ui_Dialog(object):
         self.pushButton_9.setGeometry(QtCore.QRect(200, 50, 91, 23))
         self.pushButton_9.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
-        self.pushButton_9.setObjectName("pushButton_8")
+        self.pushButton_9.setObjectName("pushButton_9")
+
+        self.pushButton_10 = QtWidgets.QPushButton(Dialog)
+        self.pushButton_10.setGeometry(QtCore.QRect(390, 50, 91, 23))
+        self.pushButton_10.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
+                                        "background-color: rgb(212, 212, 212);")
+        self.pushButton_10.setObjectName("pushButton_10")
 
         self.progressBar = QtWidgets.QProgressBar(Dialog)
         self.progressBar.setGeometry(QtCore.QRect(430, 420, 118, 23))
@@ -144,10 +150,11 @@ class Ui_Dialog(object):
         self.pushButton_3.clicked.connect(self.clear_text)
         self.pushButton_4.clicked.connect(self.get_public_ip)
         self.pushButton_5.clicked.connect(self.measure_speed)
-        self.pushButton_6.clicked.connect(self.ping_your_ip)
+        self.pushButton_6.clicked.connect(self.get_ip)
         self.pushButton_7.clicked.connect(self.port_scanner)
         self.pushButton_8.clicked.connect(self.show_popup)
         self.pushButton_9.clicked.connect(self.os_detect)
+        self.pushButton_10.clicked.connect(self.detect_all_network)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -182,8 +189,8 @@ class Ui_Dialog(object):
         self.pushButton_5.setToolTip(_translate("Dialog", "Performs a speedtest from speedtest.net"))
         self.pushButton_5.setText(_translate("Dialog", "Speedtest"))
 
-        self.pushButton_6.setToolTip(_translate("Dialog", "Pings your local machine"))
-        self.pushButton_6.setText(_translate("Dialog", "Ping Host"))
+        self.pushButton_6.setToolTip(_translate("Dialog", "Retrieves your local IP address"))
+        self.pushButton_6.setText(_translate("Dialog", "Print host IP"))
 
         self.pushButton_7.setToolTip(_translate("Dialog", "Port scan of open ports on specified IP"))
         self.pushButton_7.setText(_translate("Dialog", "Port scan"))
@@ -193,6 +200,9 @@ class Ui_Dialog(object):
 
         self.pushButton_9.setToolTip(_translate("Dialog", "OS detection of specified IP"))
         self.pushButton_9.setText(_translate("Dialog", "OS detection"))
+
+        self.pushButton_10.setToolTip(_translate("Dialog", "Retrieves all IP's on network with /24"))
+        self.pushButton_10.setText(_translate("Dialog", "Get all hosts"))
 
     def show_popup(self):
         msg = QMessageBox()
@@ -212,11 +222,90 @@ class Ui_Dialog(object):
         self.lineEdit.clear()
         self.textEdit.clear()
 
-    def ping_your_ip(self):
-        self.textEdit.clear()
+    def get_ip(self):
         def callback():
-            ping = os.popen('ping ' + socket.gethostbyname(socket.gethostname())).read()
-            self.textEdit.append(ping)
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                # doesn't even have to be reachable
+                s.connect(('10.255.255.255', 1))
+                IP = s.getsockname()[0]
+            except Exception:
+                IP = '127.0.0.1'
+            finally:
+                s.close()
+            self.textEdit.append("Your local IP: " + IP)
+
+        t = threading.Thread(target=callback)
+        t.start()
+
+    def detect_all_network(self):
+        def callback():
+            global IP
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                # doesn't even have to be reachable
+                s.connect(('10.255.255.255', 1))
+                IP = s.getsockname()[0]
+            except Exception:
+                IP = '127.0.0.1'
+            finally:
+                s.close()
+                print_lock = threading.Lock()
+
+                net_addr = str(".".join(IP.split('.')[0:-1]) + '.'+'0'+'/24')
+                start_time = time.time()
+                ip_net = ipaddress.ip_network(net_addr)
+                all_hosts = list(ip_net.hosts())
+                info = subprocess.STARTUPINFO()
+                info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                info.wShowWindow = subprocess.SW_HIDE
+
+                print('Sweeping Network with ICMP: ', net_addr)
+                self.textEdit.append('Sweeping the network with ICMP: ' + str(net_addr) + '\n')
+
+                def pingsweep(ip):
+                    response = \
+                        subprocess.Popen(['ping', '-n', '1', '-w', '600', str(all_hosts[ip])],
+                                         stdout=subprocess.PIPE,
+                                         startupinfo=info).communicate()[0]
+
+                    with print_lock:
+                        print('\033[93m', end='')
+                        # code logic if we have/don't have good response
+                        if "Reply" in response.decode('utf-8'):
+                            print(str(all_hosts[ip]), '\033[32m' + "is Online")
+                            self.textEdit.append(str(all_hosts[ip]))
+                        elif "Destination host unreachable" in response.decode('utf-8'):
+                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Unreachable)")
+                            pass
+                        elif "Request timed out" in response.decode('utf-8'):
+                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Timeout)")
+                            pass
+                        else:
+                            print("UNKNOWN", end='')
+                            self.textEdit.append("UNKNOWN")
+
+                def threader():
+                    while True:
+                        worker = q.get()
+                        pingsweep(worker)
+                        q.task_done()
+
+                q = Queue()
+
+                for x in range(64):
+                    th = threading.Thread(target=threader)
+                    th.daemon = True
+                    th.start()
+
+                for worker in range(len(all_hosts)):
+                    q.put(worker)
+
+                q.join()
+
+                runtime = float("%0.2f" % (time.time() - start_time))
+                print("Run Time: ", runtime, "seconds")
+                self.textEdit.append("\nThe IP's listed above are online:\nRun Time: " + str(runtime) + " seconds")
 
         t = threading.Thread(target=callback)
         t.start()
@@ -242,7 +331,7 @@ class Ui_Dialog(object):
             self.textEdit.append('Performing OS scan on: ' + str(text_input) + '\n')
             nmap = nmap3.Nmap()
             version_result = nmap.nmap_version_detection(text_input)
-            pprint.pprint(version_result, width=61)
+            # pprint.pprint(version_result, width=61)
 
             try:
                 self.textEdit.append('Port       : ' + str(version_result[0]['port']))
@@ -250,7 +339,7 @@ class Ui_Dialog(object):
                 self.textEdit.append('Reason   : ' + str(version_result[0]['reason']))
                 self.textEdit.append('Method   : ' + str(version_result[0]['service']['method']))
                 self.textEdit.append('OS type  : ' + str(version_result[0]['service']['ostype']))
-            except IndexError:
+            except (IndexError, KeyError):
                 self.textEdit.append('Could not detect OS')
             try:
                 if str(version_result[0]['service']['ostype']) == 'Linux':
@@ -258,7 +347,7 @@ class Ui_Dialog(object):
                     self.textEdit.append('Product : ' + str(version_result[0]['service']['product']))
                     self.textEdit.append('Version : ' + str(version_result[0]['service']['version']))
             except:
-                self.textEdit.append('Error retrieving values')
+                self.textEdit.append('Error retrieving values or timed out')
 
         t = threading.Thread(target=callback)
         t.start()
@@ -389,68 +478,69 @@ class Ui_Dialog(object):
     def multi_ping(self):
         text_input = self.lineEdit.text()
         self.textEdit.clear()
-        def callback():
-            if len(text_input) == 0:
-                self.textEdit.append("You have to write an IP : EX(192.168.1.0/24)\n")
-            else:
-                print_lock = threading.Lock()
+        if len(text_input) == 0:
+            self.textEdit.append("You have to write an IP : EX(192.168.1.0/24)\n")
+        else:
+            print_lock = threading.Lock()
 
-                net_addr = str(text_input)
-                start_time = time.time()
-                ip_net = ipaddress.ip_network(net_addr)
-                all_hosts = list(ip_net.hosts())
-                info = subprocess.STARTUPINFO()
-                info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                info.wShowWindow = subprocess.SW_HIDE
+            net_addr = str(text_input)
+            start_time = time.time()
+            ip_net = ipaddress.ip_network(net_addr)
+            all_hosts = list(ip_net.hosts())
+            info = subprocess.STARTUPINFO()
+            info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            info.wShowWindow = subprocess.SW_HIDE
 
-                print('Sweeping Network with ICMP: ', net_addr)
-                self.textEdit.append('Sweeping the network with ICMP: ' + str(net_addr) + '\n')
+            print('Sweeping Network with ICMP: ', net_addr)
+            self.textEdit.append('Sweeping the network with ICMP: ' + str(net_addr) + '\n')
 
-                def pingsweep(ip):
-                    response = \
+            def pingsweep(ip):
+                response = \
                     subprocess.Popen(['ping', '-n', '1', '-w', '600', str(all_hosts[ip])], stdout=subprocess.PIPE,
-                                         startupinfo=info).communicate()[0]
+                                     startupinfo=info).communicate()[0]
 
-                    with print_lock:
-                        print('\033[93m', end='')
-                        # code logic if we have/don't have good response
-                        if "Reply" in response.decode('utf-8'):
-                            print(str(all_hosts[ip]), '\033[32m' + "is Online")
-                            self.textEdit.append(str(all_hosts[ip]))
-                        elif "Destination host unreachable" in response.decode('utf-8'):
-                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Unreachable)")
-                            pass
-                        elif "Request timed out" in response.decode('utf-8'):
-                            # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Timeout)")
-                            pass
-                        else:
-                            print("UNKNOWN", end='')
-                            self.textEdit.append("UNKNOWN")
+                with print_lock:
+                    # code logic if we have/don't have good response
+                    if "Reply" in response.decode('utf-8'):
+                        print(str(all_hosts[ip]), "is Online")
+                        self.textEdit.append(str(all_hosts[ip]))
+                        """ip_to_int = int(ipaddress.IPv4Address(all_hosts[ip]))
+                        ip_to_list = [ip_to_int]
+                        test = str(ip_to_list)[1:-1]
+                        test = int(test)
+                        ip_to_string = str(ipaddress.IPv4Address(test))
+                        print(ip_to_string)"""
+                    elif "Destination host unreachable" in response.decode('utf-8'):
+                        # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Unreachable)")
+                        pass
+                    elif "Request timed out" in response.decode('utf-8'):
+                        # print(str(all_hosts[ip]), '\033[90m'+"is Offline (Timeout)")
+                        pass
+                    else:
+                        print("UNKNOWN", end='')
+                        self.textEdit.append("UNKNOWN")
 
-                def threader():
-                    while True:
-                        worker = q.get()
-                        pingsweep(worker)
-                        q.task_done()
+            def threader():
+                while True:
+                    worker = q.get()
+                    pingsweep(worker)
+                    q.task_done()
 
-                q = Queue()
+            q = Queue()
 
-                for x in range(64):
-                    th = threading.Thread(target=threader)
-                    th.daemon = True
-                    th.start()
+            for x in range(32):
+                th = threading.Thread(target=threader)
+                th.daemon = True
+                th.start()
 
-                for worker in range(len(all_hosts)):
-                    q.put(worker)
+            for worker in range(len(all_hosts)):
+                q.put(worker)
 
-                q.join()
+            q.join()
 
-                runtime = float("%0.2f" % (time.time() - start_time))
-                print("Run Time: ", runtime, "seconds")
-                self.textEdit.append("\nThe IP's listed above are online:\nRun Time: " + str(runtime) + " seconds")
-
-        t = threading.Thread(target=callback)
-        t.start()
+            runtime = float("%0.2f" % (time.time() - start_time))
+            print("Run Time: ", runtime, "seconds")
+            self.textEdit.append("\nThe IP's listed above are online:\nRun Time: " + str(runtime) + " seconds")
 
 
 if __name__ == "__main__":
