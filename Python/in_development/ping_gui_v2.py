@@ -92,19 +92,19 @@ class Ui_Dialog(object):
         self.textEdit.setObjectName("textEdit")
 
         self.pushButton_4 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_4.setGeometry(QtCore.QRect(410, 90, 81, 23))
+        self.pushButton_4.setGeometry(QtCore.QRect(410, 90, 91, 23))
         self.pushButton_4.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_4.setObjectName("pushButton_4")
 
         self.pushButton_5 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_5.setGeometry(QtCore.QRect(410, 120, 81, 23))
+        self.pushButton_5.setGeometry(QtCore.QRect(410, 120, 91, 23))
         self.pushButton_5.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_5.setObjectName("pushButton_5")
 
         self.pushButton_6 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_6.setGeometry(QtCore.QRect(410, 150, 81, 23))
+        self.pushButton_6.setGeometry(QtCore.QRect(410, 150, 91, 23))
         self.pushButton_6.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_6.setObjectName("pushButton_6")
@@ -128,7 +128,7 @@ class Ui_Dialog(object):
         self.pushButton_9.setObjectName("pushButton_9")
 
         self.pushButton_10 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_10.setGeometry(QtCore.QRect(390, 50, 91, 23))
+        self.pushButton_10.setGeometry(QtCore.QRect(410, 180, 91, 23))
         self.pushButton_10.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
                                         "background-color: rgb(212, 212, 212);")
         self.pushButton_10.setObjectName("pushButton_10")
@@ -161,8 +161,8 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Network Tool"))
         self.lineEdit.setPlaceholderText(_translate("Dialog", "Write IP or command here"))
 
-        self.pushButton.setText(_translate("Dialog", "Ping IP"))
         self.pushButton.setToolTip(_translate("Dialog", "Write the desired IP you want to ping"))
+        self.pushButton.setText(_translate("Dialog", "Ping IP"))
 
         self.pushButton_2.setToolTip(_translate("Dialog", "EX: 192.168.1.0/24"))
         self.pushButton_2.setText(_translate("Dialog", "Ping All /24"))
@@ -190,7 +190,7 @@ class Ui_Dialog(object):
         self.pushButton_5.setText(_translate("Dialog", "Speedtest"))
 
         self.pushButton_6.setToolTip(_translate("Dialog", "Retrieves your local IP address"))
-        self.pushButton_6.setText(_translate("Dialog", "Print host IP"))
+        self.pushButton_6.setText(_translate("Dialog", "Your local IP"))
 
         self.pushButton_7.setToolTip(_translate("Dialog", "Port scan of open ports on specified IP"))
         self.pushButton_7.setText(_translate("Dialog", "Port scan"))
@@ -479,11 +479,11 @@ class Ui_Dialog(object):
         text_input = self.lineEdit.text()
         self.textEdit.clear()
         if len(text_input) == 0:
-            self.textEdit.append("You have to write an IP : EX(192.168.1.0/24)\n")
+            self.textEdit.append("You have to write an IP : EX(192.168.1.0)\n")
         else:
             print_lock = threading.Lock()
-
-            net_addr = str(text_input)
+            net_addr = str(".".join(text_input.split('.')[0:-1]) + '.' + '0/24')
+            #net_addr = str(text_input)
             start_time = time.time()
             ip_net = ipaddress.ip_network(net_addr)
             all_hosts = list(ip_net.hosts())
