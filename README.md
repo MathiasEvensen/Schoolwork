@@ -1,5 +1,7 @@
 # Schoolwork
 Some of my projects and programs
+### Bachelor Project
+[Android app for Music, Mood and Fitness](https://github.com/EgdeNorway/MMF)
 ### Network tool with gui
 [Ping_gui](Python/in_development/ping_gui_v2.py)
 ### My discord bot
