@@ -40,7 +40,7 @@ jobs:
       uses: actions/setup-java@v1.4.3
       with:
         # The Java version to make available on the path. Takes a whole or semver Java version, or 1.x syntax (e.g. 1.8 => Java 8.x). Early access versions can be specified in the form of e.g. 14-ea, 14.0.0-ea, or 14.0.0-ea.28
-        java-version: 13
+        java-version: 12
         # The package type (jre, jdk, jdk+fx)
         java-package: jdk
         # The architecture (x86, x64) of the package.
@@ -59,8 +59,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    #- name: Autobuild
-    #  uses: github/codeql-action/autobuild@v1
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
 
 
     # ℹ️ Command-line programs to run using the OS shell.
@@ -70,11 +70,11 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
       
-    - if: matrix.language == 'java' 
-      name: Build Java
-      run: |
-        make bootstrap
-        make release
+    #- if: matrix.language == 'java' 
+    #  name: Build Java
+    #  run: |
+    #    make bootstrap
+    #    make release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
