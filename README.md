@@ -10,7 +10,7 @@ Some of my projects and programs
 ### SQL
 #### PL/SQL
 [Final delivery/Exam](SQL/IOBY3B_PKG%20BODY%20SKYNET.sql)&emsp;<br>
-[Wiev active users](SQL/USERS-ACTIVE.sql)&emsp;<br>
+[View active users](SQL/USERS-ACTIVE.sql)&emsp;<br>
 [Exam prep](SQL/Eksamen.sql)&emsp;<br>
 
 ### Folders with java code I made: Project SimpleWebApp
