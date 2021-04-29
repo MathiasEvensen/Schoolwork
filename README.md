@@ -41,9 +41,8 @@ Some of my projects and programs
  public class FizzBuzz {
 
     public static void main(String[] args) {
-        int i=1;
         
-        for(i = 1; i <= 100; i++){
+        for(int i = 1; i <= 100; i++){
             String output = "";
             
             if(i%3 == 0){
