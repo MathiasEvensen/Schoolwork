@@ -41,22 +41,25 @@ Some of my projects and programs
  public class FizzBuzz {
 
     public static void main(String[] args) {
-        
-        for(int i = 1; i <= 100; i++){
+
+        for(int i = 0; i < 101; i++){
             String output = "";
-            
+
             if(i%3 == 0){
-                output += "Fizz";
+                output = "fizz";
             }
+
             if(i%5 == 0){
-                output += "Buzz";
+                output = "buzz";
             }
-            
-            if(output == ""){
-                System.out.print(i);
+
+            if(output.equals("")){
+                System.out.println(i);
+            } else {
+                System.out.println(output);
             }
-            System.out.println(output);
-     }
-   }
- }
+
+        }
+    }
+}
 ```
